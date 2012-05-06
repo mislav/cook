@@ -11,15 +11,14 @@ unless File.exist? node
 end
 
 FileUtils.mkdir_p root = "/tmp/chef-solo"
-
-unless File.exist? gemhome = "#{root}/ruby"
-  FileUtils.mkdir_p gemhome
-  system "/usr/bin/gem install chef --no-rdoc --no-ri --install-dir #{gemhome}"
-end
+FileUtils.mkdir_p gemhome = "#{root}/ruby"
 
 ENV['PATH']    = Dir["#{gemhome}/gems/*/bin"].join(':') + ":#{ENV['PATH']}"
 ENV['RUBYLIB'] = Dir["#{gemhome}/gems/*/{ext,lib}"].join(':') + ":#{ENV['RUBYLIB']}"
 
+unless `which chef-solo` && $?.success?
+  system "/usr/bin/gem install chef --no-rdoc --no-ri --install-dir #{gemhome}"
+end
 
 File.open(json_attribs = "#{root}/node.json", 'w') do |f|
   open(node) { |r| f.write(r.read) }
@@ -35,8 +34,10 @@ cookbook_path = cookbooks.to_enum(:each_with_index).map do |path, index|
   if File.exist? path
     system "cp -R #{path.inspect} #{target}"
   else
+    warn "Downloading #{path}"
     system "curl -sL #{path.inspect} | tar -xz -C #{target} -m --strip 1"
   end
+  exit 1 unless $?.success?
 
   target
 end
