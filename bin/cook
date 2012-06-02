@@ -13,12 +13,14 @@ end
 FileUtils.mkdir_p root = "/tmp/chef-solo"
 FileUtils.mkdir_p gemhome = "#{root}/ruby"
 
+unless Dir["#{gemhome}/gems/*/bin/chef-solo"].any?
+  warn "Installing chef"
+  system "/usr/bin/gem install chef --no-rdoc --no-ri --install-dir #{gemhome}"
+  abort "Fail installing chef" unless $?.success?
+end
+
 ENV['PATH']    = Dir["#{gemhome}/gems/*/bin"].join(':') + ":#{ENV['PATH']}"
 ENV['RUBYLIB'] = Dir["#{gemhome}/gems/*/{ext,lib}"].join(':') + ":#{ENV['RUBYLIB']}"
-
-unless `which chef-solo` && $?.success?
-  system "/usr/bin/gem install chef --no-rdoc --no-ri --install-dir #{gemhome}"
-end
 
 File.open(json_attribs = "#{root}/node.json", 'w') do |f|
   open(node) { |r| f.write(r.read) }
