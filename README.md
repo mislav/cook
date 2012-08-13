@@ -34,7 +34,7 @@ Checkout [josh/osx-cookbooks][] to get you started.
 
 ## USAGE
 
-    sudo cook
+    cook
 
 Thats it.
 
