@@ -46,8 +46,9 @@ end
 
 
 CONFIG = <<-RUBY
-log_level        :#{$DEBUG ? 'debug' : 'info'}
-log_location     "/var/log/chef.log"
+log_level        :info
+log_location     $stderr
+verbose_logging   nil
 json_attribs     #{json_attribs.inspect}
 cookbook_path    #{cookbook_path.inspect}
 file_cache_path  "#{root}"
