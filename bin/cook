@@ -34,7 +34,7 @@ cookbook_path = cookbooks.to_enum(:each_with_index).map do |path, index|
   FileUtils.mkdir_p target
 
   if File.exist? path
-    system "cp -R #{path.inspect} #{target}"
+    system 'cp', '-R', "#{path}/", target
   else
     warn "Downloading #{path}"
     system "curl -sL #{path.inspect} | tar -xz -C #{target} -m --strip 1"
@@ -47,7 +47,7 @@ end
 
 CONFIG = <<-RUBY
 log_level        :#{$DEBUG ? 'debug' : 'info'}
-log_location     $stderr
+log_location     "/var/log/chef.log"
 json_attribs     #{json_attribs.inspect}
 cookbook_path    #{cookbook_path.inspect}
 file_cache_path  "#{root}"
