@@ -34,7 +34,7 @@ cookbook_path = cookbooks.to_enum(:each_with_index).map do |path, index|
   FileUtils.mkdir_p target
 
   if File.exist? path
-    system 'cp', '-R', "#{path}/", target
+    system 'cp', '-R', "#{path}/.", target
   else
     warn "Downloading #{path}"
     system "curl -sL #{path.inspect} | tar -xz -C #{target} -m --strip 1"
