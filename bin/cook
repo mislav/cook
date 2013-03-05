@@ -7,20 +7,18 @@ require 'yaml'
 node = ARGV[0] || "#{ENV['HOME']}/.cook"
 
 unless File.exist? node
-  abort "cook node.json"
+  warn "No file at #{node}"
+  abort "Usage: cook node.json"
 end
 
 FileUtils.mkdir_p root = "/tmp/chef-solo"
-FileUtils.mkdir_p gemhome = "#{root}/ruby"
+chef_solo = "/opt/chef/bin/chef-solo"
 
-unless Dir["#{gemhome}/gems/*/bin/chef-solo"].any?
-  warn "Installing chef"
-  system "/usr/bin/gem install chef --no-rdoc --no-ri --install-dir #{gemhome}"
-  abort "Fail installing chef" unless $?.success?
+unless File.executable?(chef_solo)
+  warn "Installing chef..."
+  system "curl -#L http://www.opscode.com/chef/install.sh | sudo bash"
+  abort "Failed installing chef" unless File.executable?(chef_solo)
 end
-
-ENV['PATH']    = Dir["#{gemhome}/gems/*/bin"].join(':') + ":#{ENV['PATH']}"
-ENV['RUBYLIB'] = Dir["#{gemhome}/gems/*/{ext,lib}"].join(':') + ":#{ENV['RUBYLIB']}"
 
 File.open(json_attribs = "#{root}/node.json", 'w') do |f|
   open(node) { |r| f.write(r.read) }
@@ -58,4 +56,6 @@ RUBY
 
 File.open(config = "#{root}/solo.rb", 'w') { |f| f.write CONFIG }
 
-exec '/usr/bin/ruby', '-S', 'chef-solo', '-c', config
+ENV['PATH'] = "#{File.dirname(chef_solo)}:#{ENV['PATH']}"
+
+exec 'chef-solo', '-c', config
