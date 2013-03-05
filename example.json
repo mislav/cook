@@ -1,8 +1,30 @@
 {
-  "cookbooks": ["http://github.com/josh/osx-cookbooks/tarball/master"],
+  "cookbooks": [
+    "https://github.com/mislav/osx-cookbooks/tarball/depends-archive"
+  ],
 
   "run_list": [
-    "git",
     "homebrew"
-  ]
+  , "git"
+  , "rbenv"
+  , "macvim"
+  , "pow"
+  , "node"
+  , "phantomjs"
+  , "redis"
+  , "memcached"
+  , "handbrake"
+  ],
+
+  "redis": {
+    "launchd": false
+  },
+  "memcached": {
+    "launchd": false
+  },
+
+  "rbenv": {
+    "root": "/Users/mislav/.rbenv"
+  , "global": "2.0.0-p0"
+  }
 }
